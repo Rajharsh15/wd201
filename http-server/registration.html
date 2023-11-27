@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            border-radius: 10px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form id="registrationForm" onsubmit="submitForm(event)">
+        <h2>Registration Form</h2>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter a name" name= "name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required>
+
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">Accept Terms & Conditions</label>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="error-message"></div>
+
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Dob</th>
+                <th>Accepted Terms?</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadEntriesFromLocalStorage);
+
+        function submitForm(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const dob = document.getElementById('dob').value;
+            const terms = document.getElementById('terms').checked;
+
+            if (!validateAge(dob)) {
+                document.getElementById('error-message').textContent = 'Please enter a valid date of birth between the ages of 18 and 55.';
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                document.getElementById('error-message').textContent = 'Please enter a valid email address.';
+                return;
+            }
+
+            document.getElementById('error-message').textContent = '';
+
+            const userTable = document.getElementById('userTable');
+            const userTableBody = userTable.querySelector('tbody');
+            const newRow = userTableBody.insertRow();
+            const cells = [name, email, password, dob, terms ];
+
+            cells.forEach((cellData, index) => {
+                const cell = newRow.insertCell(index);
+                cell.textContent = cellData;
+            });
+
+            saveEntryToLocalStorage(cells);
+
+            document.getElementById('registrationForm').reset();
+        }
+
+        function validateAge(dob) {
+            const currentDate = new Date();
+            const userDOB = new Date(dob);
+            const age = currentDate.getFullYear() - userDOB.getFullYear();
+            return age >= 18 && age <= 55;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function saveEntryToLocalStorage(cells) {
+            const entries = JSON.parse(localStorage.getItem('userEntries')) || [];
+            entries.push(cells);
+            localStorage.setItem('userEntries', JSON.stringify(entries));
+            loadEntriesFromLocalStorage(); 
+        }
+
+        function loadEntriesFromLocalStorage() {
+            const userTableBody = document.getElementById('userTable').querySelector('tbody');
+            const entries = JSON.parse(localStorage.getItem('userEntries')) || [];
+
+            userTableBody.innerHTML = '';
+
+            entries.forEach((entry) => {
+                const newRow = userTableBody.insertRow();
+                entry.forEach((cellData, index) => {
+                    const cell = newRow.insertCell(index);
+                    cell.textContent = cellData;
+                });
+            });
+        }
+    </script>
+    <a href="./">Back to Home</a>
+    <br>
+    <a href="./project">Back to Projects</a>
+    <br>
+    <a href="https://rajharsh15.github.io/wd101/">Visit My Portfolio</a>
+</body>
+</html>
